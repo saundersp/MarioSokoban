@@ -1,22 +1,17 @@
 #include "libraries.hpp"
 #include "loader.hpp"
 
-namespace credits
-{
-	ExitCode loop(Screen& s, const loader::Assets& assets) noexcept
-	{
+namespace credits {
+	ExitCode loop(const Screen& s, const loader::Assets& assets) noexcept {
 		ExitCode exit_code = ExitCode::NONE;
 
-		SDL_Rect txt_creator = { 203, 131, 0, 0 }, txt_version = { 315, 95, 0, 0 };
+		SDLRect txt_creator = { 203, 131 }, txt_version = { 315, 95 };
 
 		SDL_Event event;
 
-		while (exit_code == ExitCode::NONE)
-		{
-			if (SDL_PollEvent(&event))
-			{
-				switch (event.type)
-				{
+		while (exit_code == ExitCode::NONE) {
+			if (SDL_PollEvent(&event)) {
+				switch (event.type) {
 				case SDL_QUIT:
 					exit_code = ExitCode::QUIT;
 					break;
@@ -25,8 +20,7 @@ namespace credits
 						exit_code = ExitCode::QUIT;
 					break;
 				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym)
-					{
+					switch (event.key.keysym.sym) {
 					case SDLK_RETURN:
 					case SDLK_ESCAPE:
 						exit_code = ExitCode::RETURN;
@@ -41,4 +35,4 @@ namespace credits
 		}
 		return exit_code;
 	}
-} // namespace credits
+}; // namespace credits

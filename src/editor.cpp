@@ -3,23 +3,18 @@
 #include "options_menu.hpp"
 #include "game.hpp"
 
-namespace editor
-{
-
-	bool loadLevel(const uchar& n, SpriteName blocks[NB_BLOCKS_LENGTH]) noexcept
-	{
+namespace editor {
+	bool load_level(const uchar& n, SpriteName blocks[NB_BLOCKS_LENGTH]) noexcept {
 		CONSOLE_LOG("Loading level : %i", n);
-		return loader::levelLoader(DATA_LOCATION "/levels_edited.lvl", n, [blocks](const uchar& i, const uchar& c) {
+		return loader::level_loader(DATA_LOCATION "/levels_edited.lvl", n, [blocks](const uchar& i, const uchar& c) noexcept {
 			blocks[i] = (SpriteName)c;
 			});
 	}
 
-	bool saveLevel(const uchar& n, const SpriteName blocks[NB_BLOCKS_LENGTH]) noexcept
-	{
+	bool save_level(const uchar& n, const SpriteName blocks[NB_BLOCKS_LENGTH]) noexcept {
 		CONSOLE_LOG("Saving level : %i", n);
 		FILE* file = fopen(DATA_LOCATION "/levels_edited.lvl", "r+");
-		if (file == nullptr)
-		{
+		if (file == nullptr) {
 			CONSOLE_ERROR("Error can't save edited level : (%s)", SDL_GetError());
 			return false;
 		}
@@ -34,22 +29,20 @@ namespace editor
 		return true;
 	}
 
-	ExitCode loop(Screen& s, const loader::Assets& assets) noexcept
-	{
+	ExitCode loop(const Screen& s, const loader::Assets& assets) noexcept {
 		ExitCode exit_code = ExitCode::NONE;
 		uchar current_level = 0;
 
-		ExitCode ins_code = game::screen_loop(s, assets.menu_editor);
+		const ExitCode ins_code = game::screen_loop(s, assets.menu_editor);
 		if (ins_code != ExitCode::CONTINUE)
 			return ins_code;
 
 		SpriteName selected_asset = SpriteName::OBJECTIVE;
 		bool holdRight = false, holdLeft = false;
 
-		const uchar charac = options_menu::loadOptions().charac;
+		const uchar charac = options_menu::load_options().charac;
 		SDL_Surface* p = nullptr;
-		switch (charac)
-		{
+		switch (charac) {
 		default:
 			CONSOLE_ERROR("Illegal value of charac : %d", charac);
 		case 0:
@@ -65,7 +58,7 @@ namespace editor
 		SpriteName blocks[NB_BLOCKS_LENGTH] = { SpriteName::EMPTY };
 
 		SDL_Surface* lvlDisplay = nullptr;
-		SDL_Rect posLvlDisplay, posMini = { s.surface->w / 2, s.surface->h / 2, 0, 0 };
+		SDLRect posLvlDisplay, posMini = { s.surface->w / 2, s.surface->h / 2 };
 		SDL_Color color_lvlDisplay = { 0, 255, 0, 255 };
 
 		auto makeCurrentLevel = [&](const uchar& n) mutable {
@@ -75,10 +68,10 @@ namespace editor
 			lvlDisplay = TTF_RenderText_Blended(assets.arial_blk_md, level, color_lvlDisplay);
 			posLvlDisplay.x = s.surface->w / 2 - lvlDisplay->w / 2;
 			posLvlDisplay.y = s.surface->h - lvlDisplay->h;
-			return loadLevel(n, blocks);
+			return load_level(n, blocks);
 		};
 
-		if (!makeCurrentLevel(0))
+		if (makeCurrentLevel(0))
 			return ExitCode::CRASH;
 
 		// Seems a bit aggressive smh
@@ -86,20 +79,16 @@ namespace editor
 
 		SDL_Event event;
 
-		while (exit_code == ExitCode::NONE)
-		{
-			if (SDL_PollEvent(&event))
-			{
-				switch (event.type)
-				{
+		while (exit_code == ExitCode::NONE) {
+			if (SDL_PollEvent(&event)) {
+				switch (event.type) {
 				case SDL_WINDOWEVENT:
 					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 				case SDL_QUIT:
 					exit_code = ExitCode::QUIT;
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					switch (event.button.button)
-					{
+					switch (event.button.button) {
 					case SDL_BUTTON_LEFT:
 						holdLeft = true;
 						blocks[posMini.y / BLOCK_SIZE * NB_BLOCKS_WIDTH + posMini.x / BLOCK_SIZE] = selected_asset;
@@ -111,8 +100,7 @@ namespace editor
 					}
 					break;
 				case SDL_MOUSEBUTTONUP:
-					switch (event.button.button)
-					{
+					switch (event.button.button) {
 					case SDL_BUTTON_LEFT:
 						holdLeft = false;
 						break;
@@ -131,25 +119,26 @@ namespace editor
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.repeat == 0)
-						switch (event.key.keysym.sym)
-						{
+						switch (event.key.keysym.sym) {
 						case SDLK_ESCAPE:
 							exit_code = ExitCode::RETURN;
 							break;
 						case SDLK_r:
-							makeCurrentLevel(current_level);
-							break;
+							if (makeCurrentLevel(current_level))
+								return ExitCode::CRASH;
+							else
+								break;
 						case SDLK_s:
-							saveLevel(current_level, blocks);
+							save_level(current_level, blocks);
 							break;
 						case SDLK_DOWN:
 						case SDLK_PAGEDOWN:
-							if (current_level > 0 && !makeCurrentLevel(current_level - 1))
+							if (current_level > 0 && makeCurrentLevel(current_level - 1))
 								exit_code = ExitCode::CRASH;
 							break;
 						case SDLK_UP:
 						case SDLK_PAGEUP:
-							if (!makeCurrentLevel(current_level + 1))
+							if (makeCurrentLevel(current_level + 1))
 								exit_code = ExitCode::CRASH;
 							break;
 
@@ -178,12 +167,10 @@ namespace editor
 			SDL_FillRect(s.surface, NULL, SDL_MapRGB(s.surface->format, 0, 0, 0));
 
 			for (uchar y = 0; y < NB_BLOCKS_HEIGHT; y++)
-				for (uchar x = 0; x < NB_BLOCKS_WIDTH; x++)
-				{
+				for (uchar x = 0; x < NB_BLOCKS_WIDTH; x++) {
 					uchar idx = y * NB_BLOCKS_WIDTH + x;
-					if (blocks[idx] != SpriteName::EMPTY)
-					{
-						SDL_Rect pos = { x * BLOCK_SIZE, y * BLOCK_SIZE, 0, 0 };
+					if (blocks[idx] != SpriteName::EMPTY) {
+						SDLRect pos = { x * BLOCK_SIZE, y * BLOCK_SIZE };
 						SDL_BlitSurface(blocks[idx] == SpriteName::CHARACTER ? p : assets[(SpriteName)blocks[idx]], NULL, s.surface, &pos);
 					}
 				}
@@ -195,4 +182,4 @@ namespace editor
 
 		return exit_code;
 	}
-} // namespace editor
+}; // namespace editor

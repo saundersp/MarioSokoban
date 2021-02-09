@@ -17,35 +17,28 @@
 
 typedef unsigned char uchar;
 
-enum class Direction : Sint32 // Character orientation
-{
+struct SDLRect : SDL_Rect {
+	constexpr SDLRect() : SDL_Rect{ 0, 0, 0, 0 } {}
+	constexpr SDLRect(const int& x, const int& y) : SDL_Rect{ x, y, 0, 0 } {}
+};
+
+enum class Direction : Sint32 { // Character orientation
 	UP = SDLK_UP,
 	RIGHT = SDLK_RIGHT,
 	LEFT = SDLK_LEFT,
 	DOWN = SDLK_DOWN
 };
 
-enum class SpriteName : uchar
-{
+enum class SpriteName : uchar {
 	EMPTY = 48, // 48 == '0'
-	WALL,
-	BLOCK,
-	OBJECTIVE,
-	CHARACTER,
-	VALID_BLOCK
+	WALL, BLOCK, OBJECTIVE, CHARACTER, VALID_BLOCK
 };
 
-enum class ExitCode : uchar
-{
-	NONE = 0,
-	CRASH,
-	QUIT,
-	RETURN,
-	CONTINUE
+enum class ExitCode : uchar {
+	NONE = 0, CRASH, QUIT, RETURN, CONTINUE
 };
 
-struct Screen
-{
+struct Screen {
 	SDL_Window* window;
 	SDL_Surface* surface;
 };

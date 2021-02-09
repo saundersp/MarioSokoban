@@ -2,14 +2,11 @@
 #include "options_menu.hpp"
 #include "loader.hpp"
 
-namespace options_menu
-{
-	Options loadOptions()
-	{
+namespace options_menu {
+	Options load_options() noexcept {
 		CONSOLE_LOG("Loading options");
 		FILE* file = fopen(DATA_LOCATION "/options.dat", "r");
-		if (file == nullptr)
-		{
+		if (file == nullptr) {
 			CONSOLE_ERROR("Can't load options file : (%s)", strerror(errno));
 			return { 0, false };
 		}
@@ -20,12 +17,10 @@ namespace options_menu
 		return { charac, keyrepeat };
 	}
 
-	bool saveOptions(const Options& opt) noexcept
-	{
+	bool save_options(const Options& opt) noexcept {
 		CONSOLE_LOG("Saving options ...");
 		FILE* file = fopen(DATA_LOCATION "/options.dat", "w");
-		if (file == nullptr)
-		{
+		if (file == nullptr) {
 			CONSOLE_ERROR("Can't save options file : (%s)", strerror(errno));
 			return false;
 		}
@@ -36,21 +31,19 @@ namespace options_menu
 		return true;
 	}
 
-	ExitCode loop(Screen& s, const loader::Assets& assets) noexcept
-	{
+	ExitCode loop(const Screen& s, const loader::Assets& assets) noexcept {
 		ExitCode exit_code = ExitCode::NONE;
 
-		const SDL_Rect txt_yes = { 219, 310, 0, 0 }, txt_no = { 148, 310, 0, 0 }, txt_repeatkeys = { 52, 243, 0, 0 }, txt_charac = { 21, 180, 0, 0 };
-		const SDL_Rect optMario = { 143, 186, 0, 0 }, optPacman = { 217, 186, 0, 0 }, optLuigi = { 301, 186, 0, 0 };
-		const SDL_Rect boxMario = { 139, 183, 0, 0 }, boxPacman = { 214, 183, 0, 0 }, boxLuigi = { 291, 183, 0, 0 };
-		const SDL_Rect boxKeyOff = { 139, 302, 0, 0 }, boxKeyOn = { 214, 302, 0, 0 };
-		SDL_Rect point1 = { boxMario.x, 203, 0, 0 }, point2 = { 0, 322, 0, 0 }, boxSelected = boxMario;
+		const SDLRect txt_yes = { 219, 310 }, txt_no = { 148, 310 }, txt_repeatkeys = { 52, 243 }, txt_charac = { 21, 180 };
+		const SDLRect optMario = { 143, 186 }, optPacman = { 217, 186 }, optLuigi = { 301, 186 };
+		const SDLRect boxMario = { 139, 183 }, boxPacman = { 214, 183 }, boxLuigi = { 291, 183 };
+		const SDLRect boxKeyOff = { 139, 302 }, boxKeyOn = { 214, 302 };
+		SDLRect point1 = { boxMario.x, 203 }, point2 = { 0, 322 }, boxSelected = boxMario;
 
 		SDL_Event event;
 
-		Options opt = loadOptions();
-		switch (opt.charac)
-		{
+		Options opt = load_options();
+		switch (opt.charac) {
 		default:
 			CONSOLE_ERROR("Illegal value saved of opt.charac : %d", opt.charac);
 			opt.charac = 0;
@@ -71,8 +64,7 @@ namespace options_menu
 		uchar selectedLine = 0;
 
 		auto refreshSelectedCharac = [&]() {
-			switch (opt.charac)
-			{
+			switch (opt.charac) {
 			case 0:
 				boxSelected = boxMario;
 				break;
@@ -93,13 +85,10 @@ namespace options_menu
 			boxSelected = opt.keyRepeat ? boxKeyOn : boxKeyOff;
 			point2.x = boxSelected.x + 2;
 		};
-		auto draw = [s](SDL_Surface* su, SDL_Rect r) { SDL_BlitSurface(su, NULL, s.surface, &r); };
-		while (exit_code == ExitCode::NONE)
-		{
-			if (SDL_PollEvent(&event))
-			{
-				switch (event.type)
-				{
+		auto draw = [s](SDL_Surface* su, SDLRect r) { SDL_BlitSurface(su, NULL, s.surface, &r); };
+		while (exit_code == ExitCode::NONE) {
+			if (SDL_PollEvent(&event)) {
+				switch (event.type) {
 				case SDL_WINDOWEVENT:
 					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
 				case SDL_QUIT:
@@ -107,15 +96,13 @@ namespace options_menu
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.repeat == 0)
-						switch (event.key.keysym.sym)
-						{
+						switch (event.key.keysym.sym) {
 						case SDLK_ESCAPE:
 							exit_code = ExitCode::RETURN;
 							break;
 						case SDLK_UP:
 						case SDLK_DOWN:
-							switch (selectedLine)
-							{
+							switch (selectedLine) {
 							case 0:
 								selectedLine = 1;
 								refreshSelectedKeyMode();
@@ -131,8 +118,7 @@ namespace options_menu
 							}
 							break;
 						case SDLK_LEFT:
-							switch (selectedLine)
-							{
+							switch (selectedLine) {
 							case 0:
 								opt.charac = opt.charac == 0 ? 2 : opt.charac - 1;
 								refreshSelectedCharac();
@@ -148,8 +134,7 @@ namespace options_menu
 							}
 							break;
 						case SDLK_RIGHT:
-							switch (selectedLine)
-							{
+							switch (selectedLine) {
 							case 0:
 								opt.charac = opt.charac == 2 ? 0 : opt.charac + 1;
 								refreshSelectedCharac();
@@ -169,9 +154,9 @@ namespace options_menu
 			}
 			SDL_FillRect(s.surface, NULL, SDL_MapRGB(s.surface->format, 0, 0, 0));
 			SDL_BlitSurface(assets.menu_options, NULL, s.surface, NULL);
-			for (const SDL_Rect& p : { point1, point2 })
+			for (const SDLRect& p : { point1, point2 })
 				draw(assets.objective, p);
-			for (const SDL_Rect& p : { boxMario, boxPacman, boxLuigi, boxKeyOff, boxKeyOn })
+			for (const SDLRect& p : { boxMario, boxPacman, boxLuigi, boxKeyOff, boxKeyOn })
 				draw(assets.cadre, p);
 			draw(assets.cadre2, boxSelected);
 			draw(assets.txt_charac, txt_charac);
@@ -183,7 +168,7 @@ namespace options_menu
 			draw(assets.txt_no, txt_no);
 			SDL_UpdateWindowSurface(s.window);
 		}
-		saveOptions(opt);
+		save_options(opt);
 		return exit_code;
 	}
-} // namespace options_menu
+}; // namespace options_menu

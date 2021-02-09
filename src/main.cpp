@@ -3,39 +3,33 @@
 #include "main_menu.hpp"
 
 #ifdef __DEBUG__
-void* operator new(size_t size)
-{
+void* operator new(size_t size) noexcept {
 	CONSOLE_LOG("Allocating %d bytes", size);
 	return malloc(size);
 }
 
-void operator delete[](void* ptr)
-{
+void operator delete[](void* ptr) noexcept {
 	CONSOLE_LOG("Freeing[] undefined bytes");
 	free(ptr);
 }
 
-void operator delete[](void* ptr, size_t size)
-{
+void operator delete[](void* ptr, size_t size) noexcept {
 	CONSOLE_LOG("Freeing[] %d bytes", size);
 	free(ptr);
 }
 
-void operator delete(void* ptr)
-{
+void operator delete(void* ptr) noexcept {
 	CONSOLE_LOG("Freeing undefined bytes");
 	free(ptr);
 }
 
-void operator delete(void* ptr, size_t size)
-{
+void operator delete(void* ptr, size_t size) noexcept {
 	CONSOLE_LOG("Freeing %d bytes", size);
 	free(ptr);
 }
 #endif
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
 #ifndef __DEBUG__
 	freopen("stdout.txt", "a+", stdout);
 	freopen("stderr.txt", "a+", stderr);
@@ -59,23 +53,20 @@ int main(int argc, char** argv)
 #endif
 	using namespace loader;
 
-	Screen s;
-	s.window = initialize_engine("Mario Sokoban Remake " GAME_VERSION);
+	Screen s = { initialize_engine("Mario Sokoban Remake " GAME_VERSION), nullptr };
 
 	if (s.window == nullptr)
 		return quit_engine(EXIT_FAILURE);
 
 	CONSOLE_LOG("Getting window surface");
 	s.surface = SDL_GetWindowSurface(s.window);
-	if (s.surface == nullptr)
-	{
+	if (s.surface == nullptr) {
 		CONSOLE_ERROR("Error fetching window surface: (%s)", SDL_GetError());
 		return quit_engine(s.window, EXIT_FAILURE);
 	}
 
 	Assets assets = Assets();
-	if (assets.load_error != 0)
-	{
+	if (assets.load_error != 0) {
 		CONSOLE_LOG("Error loading one or more assets : %d", assets.load_error);
 		return quit_engine(assets, s, EXIT_FAILURE);
 	}
