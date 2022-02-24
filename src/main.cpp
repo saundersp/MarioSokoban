@@ -4,7 +4,7 @@
 
 #ifdef __DEBUG__
 void* operator new(size_t size) noexcept {
-	CONSOLE_LOG("Allocating %d bytes", size);
+	CONSOLE_LOG("Allocating %zu bytes", size);
 	return malloc(size);
 }
 
@@ -14,7 +14,7 @@ void operator delete[](void* ptr) noexcept {
 }
 
 void operator delete[](void* ptr, size_t size) noexcept {
-	CONSOLE_LOG("Freeing[] %d bytes", size);
+	CONSOLE_LOG("Freeing[] %zu bytes", size);
 	free(ptr);
 }
 
@@ -24,7 +24,7 @@ void operator delete(void* ptr) noexcept {
 }
 
 void operator delete(void* ptr, size_t size) noexcept {
-	CONSOLE_LOG("Freeing %d bytes", size);
+	CONSOLE_LOG("Freeing %zu bytes", size);
 	free(ptr);
 }
 #endif
