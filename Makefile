@@ -1,47 +1,41 @@
-CC := g++ -std=c++17
-SRC :=  src/main.cpp\
-		src/loader.cpp\
-		src/main_menu.cpp\
-		src/game.cpp\
-		src/credits.cpp\
-		src/options_menu.cpp\
-		src/editor.cpp
-RELEASE := bin/game.exe
-DEBUG := bin/game_debug.exe
-ICON_SRC := src/icon.rc
-ICON_OBJ := bin/icon.res
+CC := g++ -std=c++17 -m64
+SRC_DIR=src
+OBJ_DIR=out
+BIN_DIR=bin
+SRC := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ := $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+RELEASE := $(BIN_DIR)/game
+DEBUG := $(BIN_DIR)/game_debug
+ICON_SRC := $(SRC_DIR)/icon.rc
+ICON_OBJ := $(OBJ_DIR)/icon.res
 CFLAGS := -Wall -Werror -Werror=implicit-fallthrough=0 -Wextra -DDEBUG -g -D __DEBUG__ --wrapv
-LFLAGS := -L./lib -I./include -I./src/headers
-LLFLAGS := -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
-PRECOMPILED_HEADER_SOURCE := src/headers/libraries.hpp
-PRECOMPILED_HEADER = $(PRECOMPILED_HEADER_SOURCE).gch
+LFLAGS := -L./lib -I./include -I./src -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
 
-# target: dependances list
-# $@ : $^ (or $< for first)
-# Source: (https://www.labri.fr/perso/billaud/Resources/resources/AP2-POO-0910/060-faire-makefile.pdf)
+.PHONY: all release debug start clean mrproper
 
 all: $(DEBUG)
 
-release: $(RELEASE)
-
 debug: $(DEBUG)
 
-$(RELEASE): $(SRC) $(ICON_OBJ) $(PRECOMPILED_HEADER)
-	$(CC) $(SRC) ${LLFLAGS} ${LFLAGS} -o $@ $(ICON_OBJ) -mwindows
+release: $(RELEASE)
 
-$(DEBUG): $(SRC) $(ICON_OBJ) $(PRECOMPILED_HEADER)
-	$(CC) $(SRC) ${CFLAGS} $(LFLAGS) $(LLFLAGS) -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CC) -c $< $(CFLAGS) $(LFLAGS) -o $@
 
-$(PRECOMPILED_HEADER):
-	$(CC) -c $(PRECOMPILED_HEADER_SOURCE) $(CFLAGS) $(LFLAGS) $(LLFLAGS) -o $@
+$(DEBUG): $(OBJ)
+	$(CC) $^ ${LLFLAGS} ${LFLAGS} -o $@
 
-# Perprocessor doc (https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html)
+$(RELEASE): $(OBJ) $(ICON_OBJ)
+	$(CC) $^ -O4  ${LFLAGS} -o $@ -mwindows
 
 $(ICON_OBJ): $(ICON_SRC)
 	windres $^ -O coff $@
 
-clean:
-	rm $(RELEASE) | rm $(DEBUG) | true
+start: $(DEBUG)
+	cd $(BIN_DIR) && ./$(shell basename $(DEBUG))
 
-cleanall: clean
-	rm $(PRECOMPILED_HEADER) | rm $(ICON_OBJ) | true
+clean:
+	rm $(RELEASE) $(DEBUG) | true
+
+mrproper: clean
+	rm $(ICON_OBJ) $(OBJ) | true

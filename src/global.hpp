@@ -43,7 +43,7 @@ struct Screen {
 	SDL_Surface* surface;
 };
 
-#define CONSOLE_ERROR(s, e) fprintf(stderr, "[%s : %s] " s " at %s:%d\n", __DATE__, __TIME__, e, __FILE__, __LINE__)
+#define CONSOLE_ERROR(s, e) fprintf(stderr, "[%s : %s] ERROR " s " at %s:%d\n", __DATE__, __TIME__, e, __FILE__, __LINE__)
 
 #ifdef __DEBUG__
 #define CONSOLE_LOG(s, ...) fprintf(stdout, "[%s : %s] " s "\n", __DATE__, __TIME__ __VA_OPT__(, ) __VA_ARGS__)

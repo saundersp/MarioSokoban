@@ -1,5 +1,6 @@
 include
 lib
 bin
-*.gch
+out
 .vscode
+.vim

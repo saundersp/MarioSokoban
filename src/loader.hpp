@@ -16,7 +16,7 @@ namespace loader {
 		TTF_Font* arial_blk_std, * arial_blk_md, * arial_blk_small, * arial_blk_xsmall;
 
 		// Sprites
-		SDL_Surface* window_icon, * menu_selector, * congratulations;
+		SDL_Surface* window_icon, * menu_selector;
 		SDL_Surface* cadre, * cadre2, * box, * box_placed, * objective, * wall;
 
 		// Characters sprites
