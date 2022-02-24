@@ -5,9 +5,25 @@
 #include "credits.hpp"
 #include "editor.hpp"
 
+enum class Menu : uchar {
+	Game = 0, Editor, Options, Credits, Quit
+};
+
+Menu operator--(Menu& m, int) {
+	if (m == Menu::Game) m = Menu::Quit;
+	else m = static_cast<Menu>(static_cast<uchar>(m) - 1);
+	return m;
+}
+
+Menu operator++(Menu& m, int) {
+	if (m == Menu::Quit) m = Menu::Game;
+	else m = static_cast<Menu>(static_cast<uchar>(m) + 1);
+	return m;
+}
+
 namespace main_menu {
 	ExitCode loop(const Screen& s, const loader::Assets& assets) noexcept {
-		uchar menu_selected = 0;
+		Menu menu_selected = Menu::Game;
 		ExitCode c, exit_code = ExitCode::CONTINUE;
 		SDLRect menu_selector = { 120, 150 }; // First position of the pointer of the menu
 		SDLRect txt_play = { 160, 145 }, txt_editor = { 160, 195 }, txt_options = { 160, 245 };
@@ -32,36 +48,36 @@ namespace main_menu {
 
 						case SDLK_RETURN:
 							switch (menu_selected) {
-							case 0:
+							case Menu::Game:
 								c = game::loop(s, assets);
 								if (c != ExitCode::RETURN)
 									exit_code = c;
 								break;
-							case 1:
+							case Menu::Editor:
 								c = editor::loop(s, assets);
 								if (c != ExitCode::RETURN)
 									exit_code = c;
 								break;
-							case 2:
+							case Menu::Options:
 								c = options_menu::loop(s, assets);
 								if (c != ExitCode::RETURN)
 									exit_code = c;
 								break;
-							case 3:
+							case Menu::Credits:
 								c = credits::loop(s, assets);
 								if (c != ExitCode::RETURN)
 									exit_code = c;
 								break;
 							default:
-							case 4:
+							case Menu::Quit:
 								exit_code = ExitCode::QUIT;
 								break;
 							}
 							break;
 						case SDLK_UP:
-							if (menu_selected == 0) {
+							if (menu_selected == Menu::Game) {
 								menu_selector.y += 200;
-								menu_selected = 4;
+								menu_selected = Menu::Quit;
 							}
 							else {
 								menu_selector.y -= 50;
@@ -70,9 +86,9 @@ namespace main_menu {
 							break;
 
 						case SDLK_DOWN:
-							if (menu_selected == 4) {
+							if (menu_selected == Menu::Quit) {
 								menu_selector.y -= 200;
-								menu_selected = 0;
+								menu_selected = Menu::Game;
 							}
 							else {
 								menu_selector.y += 50;
