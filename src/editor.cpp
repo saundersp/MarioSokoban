@@ -7,7 +7,7 @@ namespace editor {
 	bool load_level(const uchar& n, SpriteName blocks[NB_BLOCKS_LENGTH]) noexcept {
 		CONSOLE_LOG("Loading level : %i", n);
 		return loader::level_loader(DATA_LOCATION "/levels_edited.lvl", n, [blocks](const uchar& i, const uchar& c) noexcept {
-			blocks[i] = (SpriteName)c;
+			blocks[i] = static_cast<SpriteName>(c);
 			});
 	}
 
