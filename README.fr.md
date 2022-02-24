@@ -17,12 +17,12 @@ make release
 
 ## Bibliothèques utilisées
 
-- [SDL 2.0.12](https://www.libsdl.org)
+- [SDL 2.0.20](https://www.libsdl.org)
 - [SDL_Image 2.0.5](https://www.libsdl.org/projects/SDL_image/)
-- [SDL_TTF 2.0.15](https://www.libsdl.org/projects/SDL_ttf/)
+- [SDL_TTF 2.0.18](https://www.libsdl.org/projects/SDL_ttf/)
 
 ## Crédits
 
-La plupart des assets ont été crées par _Mateo21_ et sont accessibles [ici](https://openclassrooms.com/fr/courses/19980-apprenez-a-programmer-en-c/18709-tp-mario-sokoban).
+La plupart des assets ont été crées par _Mateo21_ et sont accessibles [ici](http://sdz.tdct.org/sdz/apprenez-a-programmer-en-c.html#TPMarioSokoban).
 
 *2020 Pierre Saunders @saundersp*
