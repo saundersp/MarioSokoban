@@ -52,7 +52,6 @@ namespace loader {
 		CONSOLE_LOG("Loading Sprites...");
 		// Loading sprites
 		load_error += load(&window_icon, DATA_LOCATION "/caisse.ico");
-		load_error += load(&congratulations, SPRITE_LOCATION "/bravo.jpg");
 		load_error += load(&cadre, SPRITE_LOCATION "/cadre.png");
 		load_error += load(&cadre2, SPRITE_LOCATION "/cadre2.png");
 		load_error += load(&box, SPRITE_LOCATION "/caisse.jpg");
@@ -102,7 +101,7 @@ namespace loader {
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying Sprites");
 		// Sprites
-		for (SDL_Surface* s : { window_icon, congratulations, cadre, cadre2, box, box_placed, objective, wall })
+		for (SDL_Surface* s : { window_icon, cadre, cadre2, box, box_placed, objective, wall })
 			if (s != nullptr)
 				SDL_FreeSurface(s);
 		CONSOLE_LOG("Destroying assets");
