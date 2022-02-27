@@ -9,7 +9,13 @@ DEBUG := $(BIN_DIR)/game_debug
 ICON_SRC := $(SRC_DIR)/icon.rc
 ICON_OBJ := $(OBJ_DIR)/icon.res
 CFLAGS := -Wall -Werror -Werror=implicit-fallthrough=0 -Wextra -DDEBUG -g -D __DEBUG__ --wrapv
-LFLAGS := -L./lib -I./include -I./src -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
+LFLAGS := -L./lib -I./include -I./src -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
+
+ifeq ($(OS),Windows_NT)
+	RELEASE := $(RELEASE).exe
+	DEBUG := $(DEBUG).exe
+	LFLAGS := -lmingw32 $(LFLAGS)
+endif
 
 .PHONY: all release debug start clean mrproper
 
@@ -23,10 +29,16 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) -c $< $(CFLAGS) $(LFLAGS) -o $@
 
 $(DEBUG): $(OBJ)
-	$(CC) $^ ${LLFLAGS} ${LFLAGS} -o $@
+	$(CC) $^ ${CFLAGS} ${LFLAGS} -o $@
 
+ifeq ($(OS),Windows_NT)
 $(RELEASE): $(OBJ) $(ICON_OBJ)
-	$(CC) $^ -O4  ${LFLAGS} -o $@ -mwindows
+	$(CC) $^ -O4 ${LFLAGS} -o $@ -mwindows
+else
+$(RELEASE): $(OBJ)
+	$(CC) $^ -O4 ${LFLAGS} -o $@
+endif
+
 
 $(ICON_OBJ): $(ICON_SRC)
 	windres $^ -O coff $@
