@@ -1,7 +1,8 @@
 CC := g++ -std=c++17 -m64
-SRC_DIR=src
-OBJ_DIR=out
-BIN_DIR=bin
+SRC_DIR := src
+OBJ_DIR := out
+$(shell mkdir -p $(OBJ_DIR))
+BIN_DIR := bin
 SRC := $(wildcard $(SRC_DIR)/*.cpp)
 OBJ := $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 RELEASE := $(BIN_DIR)/game
@@ -26,28 +27,32 @@ debug: $(DEBUG)
 release: $(RELEASE)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC) -c $< $(CFLAGS) $(LFLAGS) -o $@
+	@echo Compiling $<
+	@$(CC) -c $< $(CFLAGS) $(LFLAGS) -o $@
 
 $(DEBUG): $(OBJ)
-	$(CC) $^ ${CFLAGS} ${LFLAGS} -o $@
+	@echo Linking objects files to $@
+	@$(CC) $^ ${CFLAGS} ${LFLAGS} -o $@
 
 ifeq ($(OS),Windows_NT)
+$(ICON_OBJ): $(ICON_SRC)
+	@echo Creating icon $<
+	@windres $^ -O coff $@
+
 $(RELEASE): $(OBJ) $(ICON_OBJ)
-	$(CC) $^ -O4 ${LFLAGS} -o $@ -mwindows
+	@echo Compiling $<
+	@$(CC) $^ -O4 ${LFLAGS} -o $@ -mwindows
 else
 $(RELEASE): $(OBJ)
-	$(CC) $^ -O4 ${LFLAGS} -o $@
+	@echo Compiling $<
+	@$(CC) $^ -O4 ${LFLAGS} -o $@
 endif
 
-
-$(ICON_OBJ): $(ICON_SRC)
-	windres $^ -O coff $@
-
 start: $(DEBUG)
-	cd $(BIN_DIR) && ./$(shell basename $(DEBUG))
+	@cd $(BIN_DIR) && ./$(shell basename $(DEBUG))
 
 clean:
-	rm $(RELEASE) $(DEBUG) | true
+	@rm $(RELEASE) $(DEBUG) | true
 
 mrproper: clean
-	rm $(ICON_OBJ) $(OBJ) | true
+	@rm $(ICON_OBJ) $(OBJ) | true
