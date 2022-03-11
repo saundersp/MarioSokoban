@@ -32,7 +32,7 @@ namespace main_menu {
 		SDL_Event event;
 
 		while (exit_code == ExitCode::CONTINUE) {
-			if (SDL_PollEvent(&event)) {
+			if (SDL_WaitEvent(&event)) {
 				switch (event.type) {
 				case SDL_WINDOWEVENT:
 					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
