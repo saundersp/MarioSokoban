@@ -44,13 +44,11 @@ namespace loader {
 	Assets::Assets() noexcept {
 		CONSOLE_LOG("Creating assets");
 		CONSOLE_LOG("Loading fonts...");
-		// Loading fonts...
 		load_error += load(&arial_blk_std, POLICE_LOCATION "/ariblk.ttf", 30);
 		load_error += load(&arial_blk_md, POLICE_LOCATION "/ariblk.ttf", 20);
 		load_error += load(&arial_blk_small, POLICE_LOCATION "/ariblk.ttf", 15);
 		load_error += load(&arial_blk_xsmall, POLICE_LOCATION "/ariblk.ttf", 14);
 		CONSOLE_LOG("Loading Sprites...");
-		// Loading sprites
 		load_error += load(&window_icon, DATA_LOCATION "/caisse.ico");
 		load_error += load(&cadre, SPRITE_LOCATION "/cadre.png");
 		load_error += load(&cadre2, SPRITE_LOCATION "/cadre2.png");
@@ -58,22 +56,19 @@ namespace loader {
 		load_error += load(&wall, SPRITE_LOCATION "/mur.jpg");
 		load_error += load(&box_placed, SPRITE_LOCATION "/caisse_ok.jpg");
 		load_error += load(&menu_selector, SPRITE_LOCATION "/objectif.png");
-		SDL_CreateRGBSurface(menu_selector->flags, menu_selector->w, menu_selector->h, 32, 0, 0, 0, 0); // Allocating memory before the deep copy
+		objective = SDL_CreateRGBSurface(menu_selector->flags, menu_selector->w, menu_selector->h, 32, 0, 0, 0, 0); // Allocating memory before the deep copy
 		SDL_BlitSurface(menu_selector, NULL, objective, NULL); // Deep copy the surface
 		CONSOLE_LOG("Loading SpritePlayers...");
-		// Loading SpritePlayer
 		load_error += (mario = new SpritePlayer("mario", "gif"))->load_error;
 		load_error += (luigi = new SpritePlayer("luigi", "png"))->load_error;
 		load_error += (pacman = new SpritePlayer("pac", "png"))->load_error;
 		CONSOLE_LOG("Loading Menus...");
-		// Loading menus
 		load_error += load(&menu, MENU_LOCATION "/menu.png");
 		load_error += load(&menu_options, MENU_LOCATION "/options.png");
 		load_error += load(&menu_editor, MENU_LOCATION "/instructions.png");
 		load_error += load(&menu_credits, MENU_LOCATION "/credits.png");
 		load_error += load(&menu_play, MENU_LOCATION "/instructions_jeu.png");
 		CONSOLE_LOG("Creating Text sprites...");
-		// Creating text sprites
 		auto txtshd = [](TTF_Font* f, const char* s) noexcept { return f == nullptr ? NULL : TTF_RenderUTF8_Shaded(f, s, { 255, 255, 255, 255 }, { 0, 0, 0, 255 }); };
 		txt_play = txtshd(arial_blk_std, "Jouer");
 		txt_editor = txtshd(arial_blk_std, "Editeur");
@@ -93,19 +88,16 @@ namespace loader {
 	void Assets::free() const noexcept {
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying Fonts");
-		// Fonts
 		for (TTF_Font* f : { arial_blk_std, arial_blk_md, arial_blk_small, arial_blk_xsmall })
 			if (f != nullptr)
 				TTF_CloseFont(f);
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying Sprites");
-		// Sprites
 		for (SDL_Surface* s : { window_icon, cadre, cadre2, box, box_placed, objective, wall })
 			if (s != nullptr)
 				SDL_FreeSurface(s);
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying SpritePlayers");
-		// Sprites player
 		for (SpritePlayer* p : { mario, luigi, pacman })
 			if (p != nullptr) {
 				p->free();
@@ -113,13 +105,11 @@ namespace loader {
 			}
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying fonts");
-		// Menus
 		for (SDL_Surface* s : { menu, menu_selector, menu_options, menu_play, menu_editor })
 			if (s != nullptr)
 				SDL_FreeSurface(s);
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying Text sprites");
-		// Texts sprites
 		for (SDL_Surface* s : { txt_play, txt_editor, txt_options, txt_credits, txt_quit, txt_quit_confirm, txt_creator, txt_version, txt_yes, txt_no, txt_repeatkeys, txt_charac })
 			if (s != nullptr)
 				SDL_FreeSurface(s);
@@ -145,7 +135,6 @@ namespace loader {
 
 	SDL_Window* initialize_engine(const char* title) noexcept {
 		CONSOLE_LOG("Initialiasing SDL engine");
-		// Init SDL Engine
 		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 			CONSOLE_ERROR("Error initializing video: (%s)", SDL_GetError());
 			return NULL;
