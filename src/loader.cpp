@@ -58,9 +58,8 @@ namespace loader {
 		load_error += load(&wall, SPRITE_LOCATION "/mur.jpg");
 		load_error += load(&box_placed, SPRITE_LOCATION "/caisse_ok.jpg");
 		load_error += load(&menu_selector, SPRITE_LOCATION "/objectif.png");
-		if (menu_selector != nullptr)
-			SDL_SetColorKey(menu_selector, SDL_TRUE, SDL_MapRGB(menu_selector->format, 255, 255, 255));
-		objective = menu_selector;
+		SDL_CreateRGBSurface(menu_selector->flags, menu_selector->w, menu_selector->h, 32, 0, 0, 0, 0); // Allocating memory before the deep copy
+		SDL_BlitSurface(menu_selector, NULL, objective, NULL); // Deep copy the surface
 		CONSOLE_LOG("Loading SpritePlayers...");
 		// Loading SpritePlayer
 		load_error += (mario = new SpritePlayer("mario", "gif"))->load_error;
