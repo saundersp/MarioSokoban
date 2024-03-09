@@ -167,10 +167,12 @@ namespace game {
 							if (makeCurrentLevel(currentLevel))
 								exit_code = ExitCode::CRASH;
 							break;
+						case SDLK_KP_MINUS:
 						case SDLK_PAGEDOWN:
 							if (currentLevel > 0 && makeCurrentLevel(currentLevel - 1))
 								exit_code = ExitCode::CRASH;
 							break;
+						case SDLK_KP_PLUS:
 						case SDLK_PAGEUP:
 							if (makeCurrentLevel(currentLevel + 1))
 								exit_code = ExitCode::CRASH;

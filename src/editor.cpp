@@ -132,11 +132,13 @@ namespace editor {
 							save_level(current_level, blocks);
 							break;
 						case SDLK_DOWN:
+						case SDLK_KP_MINUS:
 						case SDLK_PAGEDOWN:
 							if (current_level > 0 && makeCurrentLevel(current_level - 1))
 								exit_code = ExitCode::CRASH;
 							break;
 						case SDLK_UP:
+						case SDLK_KP_PLUS:
 						case SDLK_PAGEUP:
 							if (makeCurrentLevel(current_level + 1))
 								exit_code = ExitCode::CRASH;
