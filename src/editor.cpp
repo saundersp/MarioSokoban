@@ -20,7 +20,7 @@ namespace editor {
 		}
 
 		// Skipping the first levels of the file
-		fseek(file, n * (NB_BLOCKS_LENGTH + 2), SEEK_SET);
+		fseek(file, n * (NB_BLOCKS_LENGTH + 1), SEEK_SET);
 
 		for (uchar i = 0; i < NB_BLOCKS_LENGTH; i++)
 			fputc((int)blocks[i], file);
@@ -63,8 +63,8 @@ namespace editor {
 
 		auto makeCurrentLevel = [&](const uchar& n) mutable {
 			current_level = n;
-			char level[17] = { 0 };
-			sprintf(level, "Custom Level : %d", n + 1);
+			char level[20] = { 0 };
+			sprintf(level, "Custom Level : %d\n", n + 1);
 			lvlDisplay = TTF_RenderText_Blended(assets.arial_blk_md, level, color_lvlDisplay);
 			posLvlDisplay.x = s.surface->w / 2 - lvlDisplay->w / 2;
 			posLvlDisplay.y = s.surface->h - lvlDisplay->h;

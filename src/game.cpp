@@ -133,9 +133,9 @@ namespace game {
 			}
 			if (currentLevel != n) {
 				currentLevel = n;
-				char level[17] = { 0 };
-				if (isSource) sprintf(level, "Level : %d", n + 1);
-				else sprintf(level, "Custom Level: %d", real_n + 1);
+				char level[20] = { 0 };
+				if (isSource) sprintf(level, "Level : %d\n", n + 1);
+				else sprintf(level, "Custom Level: %d\n", real_n + 1);
 				lvlDisplay = TTF_RenderText_Blended(assets.arial_blk_md, level, color_lvlDisplay);
 				posLvlDisplay.x = s.surface->w / 2 - lvlDisplay->w / 2;
 				posLvlDisplay.y = s.surface->h - lvlDisplay->h;
