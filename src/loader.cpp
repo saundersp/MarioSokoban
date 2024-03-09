@@ -105,7 +105,7 @@ namespace loader {
 			}
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying fonts");
-		for (SDL_Surface* s : { menu, menu_selector, menu_options, menu_play, menu_editor })
+		for (SDL_Surface* s : { menu, menu_selector, menu_options, menu_credits, menu_play, menu_editor })
 			if (s != nullptr)
 				SDL_FreeSurface(s);
 		CONSOLE_LOG("Destroying assets");
@@ -208,7 +208,7 @@ namespace loader {
 		}
 
 		// Skipping the first levels of the file
-		fseek(f, n * (NB_BLOCKS_LENGTH + 2), SEEK_SET);
+		fseek(f, n * (NB_BLOCKS_LENGTH + 1), SEEK_SET);
 
 		char c;
 		for (uchar i = 0; i < NB_BLOCKS_LENGTH && (c = getc(f)) != EOF; i++)
