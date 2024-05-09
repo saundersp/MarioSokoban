@@ -45,6 +45,7 @@ namespace editor {
 		switch (charac) {
 		default:
 			CONSOLE_ERROR("Illegal value of charac : %d", charac);
+			[[fallthrough]];
 		case 0:
 			p = (*assets.mario)[Direction::DOWN];
 			break;
