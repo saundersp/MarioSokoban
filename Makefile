@@ -1,7 +1,7 @@
-CC := g++ -std=c++17 -m64
+PREFIX :=
+CC := $(PREFIX)g++
 SRC_DIR := src
 OBJ_DIR := out
-$(shell mkdir -p $(OBJ_DIR))
 BIN_DIR := bin
 SRC := $(wildcard $(SRC_DIR)/*.cpp)
 OBJ := $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
@@ -9,50 +9,78 @@ RELEASE := $(BIN_DIR)/game
 DEBUG := $(BIN_DIR)/game_debug
 ICON_SRC := $(SRC_DIR)/icon.rc
 ICON_OBJ := $(OBJ_DIR)/icon.res
-CFLAGS := -Wall -Werror -Werror=implicit-fallthrough=0 -Wextra -DDEBUG -g -D __DEBUG__ --wrapv
-LFLAGS := -L./lib -I./include -I./src -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
+CPPFLAGS := -DDEBUG -D __DEBUG__ --wrapv -I./src -MMD -MP
+CFLAGS := -m64 -std=c++17 -g -Wall -Werror -Wextra
+LDLIBS := $(shell $(PREFIX)pkg-config --cflags --libs sdl2)
+LDLIBS := $(LDLIBS) $(shell $(PREFIX)pkg-config --cflags --libs SDL2_image)
+LDLIBS := $(LDLIBS) $(shell $(PREFIX)pkg-config --cflags --libs SDL2_ttf)
 
+WINDOWS := 0
 ifeq ($(OS),Windows_NT)
-	RELEASE := $(RELEASE).exe
-	DEBUG := $(DEBUG).exe
-	LFLAGS := -lmingw32 $(LFLAGS)
+	WINDOWS := 1
+endif
+ifeq ($(PREFIX),x86_64-w64-mingw32-)
+	WINDOWS := 1
 endif
 
-.PHONY: all release debug start clean mrproper
+ifeq ($(WINDOWS),1)
+	RELEASE := $(RELEASE).exe
+	DEBUG := $(DEBUG).exe
+	LDLIBS := -static-libgcc -static-libstdc++ -lmingw32 $(LDLIBS)
+endif
 
+.PHONY: all
 all: $(DEBUG)
 
+.PHONY: debug
 debug: $(DEBUG)
 
+.PHONY: release
 release: $(RELEASE)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(OBJ_DIR):
+	@mkdir -v $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	@echo Compiling $<
-	@$(CC) -c $< $(CFLAGS) $(LFLAGS) -o $@
+	@$(CC) -c $< $(LDLIBS) $(CPPFLAGS) $(CFLAGS) -o $@
 
 $(DEBUG): $(OBJ)
 	@echo Linking objects files to $@
-	@$(CC) $^ ${CFLAGS} ${LFLAGS} -o $@
+	@$(CC) $^ $(LDLIBS) -o $@
 
-ifeq ($(OS),Windows_NT)
+ifeq ($(WINDOWS),1)
 $(ICON_OBJ): $(ICON_SRC)
 	@echo Creating icon $<
-	@windres $^ -O coff $@
+	@$(PREFIX)windres $^ -O coff $@
 
 $(RELEASE): $(OBJ) $(ICON_OBJ)
-	@echo Compiling $<
-	@$(CC) $^ -O4 ${LFLAGS} -o $@ -mwindows
+	@echo Linking objects files to $@
+	@$(CC) $^ -O2 $(LDLIBS) -o $@ -mwindows
 else
 $(RELEASE): $(OBJ)
-	@echo Compiling $<
-	@$(CC) $^ -O4 ${LFLAGS} -o $@
+	@echo Linking objects files to $@
+	@$(CC) $^ -O2 $(LDLIBS) -o $@
 endif
 
+.PHONY: start
 start: $(DEBUG)
+ifeq ($(WINDOWS),1)
+	@cd $(BIN_DIR) && wine ./$(shell basename $(DEBUG))
+else
 	@cd $(BIN_DIR) && ./$(shell basename $(DEBUG))
+endif
 
+.PHONY: check
+check: $(DEBUG)
+	@cd $(BIN_DIR) && valgrind -q --leak-check=full --show-leak-kinds=all ./$(shell basename $(DEBUG))
+
+.PHONY: clean
 clean:
-	@rm $(RELEASE) $(DEBUG) | true
+	@rm -fv $(RELEASE) $(DEBUG)
 
+.PHONY: mrproper
 mrproper: clean
-	@rm $(ICON_OBJ) $(OBJ) | true
+	@rm -frv $(ICON_OBJ) $(OBJ_DIR)
+
+-include $(OBJ:.o=.d)
