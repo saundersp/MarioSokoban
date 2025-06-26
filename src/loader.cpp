@@ -1,6 +1,4 @@
 #include "loader.hpp"
-#include "game.hpp"
-#include "options_menu.hpp"
 
 namespace loader {
 	SpritePlayer::SpritePlayer(const char* name, const char* ext) noexcept {
@@ -8,10 +6,7 @@ namespace loader {
 		auto loadDir = [name, ext](SDL_Surface** s, const char* d) noexcept {
 			char dir[40];
 			snprintf(dir, sizeof dir, SPRITE_LOCATION "/%s_%s.%s", name, d, ext);
-			bool load_error = load(s, dir);
-			if (*s != nullptr)
-				SDL_SetColorKey(*s, SDL_TRUE, SDL_MapRGB((*s)->format, 255, 255, 255));
-			return load_error;
+			return load(s, dir);
 		};
 
 		load_error += loadDir(&up, "haut");
@@ -23,7 +18,7 @@ namespace loader {
 	constexpr void SpritePlayer::free() const noexcept {
 		for (SDL_Surface* s : { up, right, down, left })
 			if (s != nullptr)
-				SDL_FreeSurface(s);
+				SDL_DestroySurface(s);
 	}
 
 	SDL_Surface* SpritePlayer::operator[](const Direction& d) const noexcept {
@@ -56,11 +51,15 @@ namespace loader {
 		load_error += load(&wall, SPRITE_LOCATION "/mur.jpg");
 		load_error += load(&box_placed, SPRITE_LOCATION "/caisse_ok.jpg");
 		load_error += load(&menu_selector, SPRITE_LOCATION "/objectif.png");
-		objective = SDL_CreateRGBSurface(menu_selector->flags, menu_selector->w, menu_selector->h, 32, 0, 0, 0, 0); // Allocating memory before the deep copy
+		objective = SDL_CreateSurface(menu_selector->w, menu_selector->h, SDL_PIXELFORMAT_ARGB32); // Allocating memory before the deep copy
 		SDL_BlitSurface(menu_selector, NULL, objective, NULL); // Deep copy the surface
 		CONSOLE_LOG("Loading SpritePlayers...");
 		load_error += (mario = new SpritePlayer("mario", "gif"))->load_error;
 		load_error += (luigi = new SpritePlayer("luigi", "png"))->load_error;
+		if (luigi->down != nullptr) SDL_SetSurfaceColorKey(luigi->down, true, SDL_MapRGB(SDL_GetPixelFormatDetails((luigi->down)->format), NULL, 255, 255, 255));
+		if (luigi->up != nullptr) SDL_SetSurfaceColorKey(luigi->up, true, SDL_MapRGB(SDL_GetPixelFormatDetails((luigi->up)->format), NULL, 255, 255, 255));
+		if (luigi->right != nullptr) SDL_SetSurfaceColorKey(luigi->right, true, SDL_MapRGB(SDL_GetPixelFormatDetails((luigi->right)->format), NULL, 255, 255, 255));
+		if (luigi->left != nullptr) SDL_SetSurfaceColorKey(luigi->left, true, SDL_MapRGB(SDL_GetPixelFormatDetails((luigi->left)->format), NULL, 255, 255, 255));
 		load_error += (pacman = new SpritePlayer("pac", "png"))->load_error;
 		CONSOLE_LOG("Loading Menus...");
 		load_error += load(&menu, MENU_LOCATION "/menu.png");
@@ -69,7 +68,7 @@ namespace loader {
 		load_error += load(&menu_credits, MENU_LOCATION "/credits.png");
 		load_error += load(&menu_play, MENU_LOCATION "/instructions_jeu.png");
 		CONSOLE_LOG("Creating Text sprites...");
-		auto txtshd = [](TTF_Font* f, const char* s) noexcept { return f == nullptr ? NULL : TTF_RenderUTF8_Shaded(f, s, { 255, 255, 255, 255 }, { 0, 0, 0, 255 }); };
+		auto txtshd = [](TTF_Font* f, const char* s) noexcept { return f == nullptr ? NULL : TTF_RenderText_Shaded(f, s, strlen(s), { 255, 255, 255, 255 }, { 0, 0, 0, 255 }); };
 		txt_play = txtshd(arial_blk_std, "Jouer");
 		txt_editor = txtshd(arial_blk_std, "Editeur");
 		txt_options = txtshd(arial_blk_std, "Options");
@@ -95,7 +94,7 @@ namespace loader {
 		CONSOLE_LOG("Destroying Sprites");
 		for (SDL_Surface* s : { window_icon, cadre, cadre2, box, box_placed, objective, wall })
 			if (s != nullptr)
-				SDL_FreeSurface(s);
+				SDL_DestroySurface(s);
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying SpritePlayers");
 		for (SpritePlayer* p : { mario, luigi, pacman })
@@ -107,12 +106,12 @@ namespace loader {
 		CONSOLE_LOG("Destroying fonts");
 		for (SDL_Surface* s : { menu, menu_selector, menu_options, menu_credits, menu_play, menu_editor })
 			if (s != nullptr)
-				SDL_FreeSurface(s);
+				SDL_DestroySurface(s);
 		CONSOLE_LOG("Destroying assets");
 		CONSOLE_LOG("Destroying Text sprites");
 		for (SDL_Surface* s : { txt_play, txt_editor, txt_options, txt_credits, txt_quit, txt_quit_confirm, txt_creator, txt_version, txt_yes, txt_no, txt_repeatkeys, txt_charac })
 			if (s != nullptr)
-				SDL_FreeSurface(s);
+				SDL_DestroySurface(s);
 		CONSOLE_LOG("Done freeing assets !");
 	}
 
@@ -135,22 +134,18 @@ namespace loader {
 
 	SDL_Window* initialize_engine(const char* title) noexcept {
 		CONSOLE_LOG("Initialiasing SDL engine");
-		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		if (!SDL_Init(SDL_INIT_VIDEO)) {
 			CONSOLE_ERROR("Error initializing video: (%s)", SDL_GetError());
 			return NULL;
 		}
 		CONSOLE_LOG("Initialiasing TTF engine");
-		if (TTF_Init() < 0) {
-			CONSOLE_ERROR("Error initializing TTF: (%s)", TTF_GetError());
+		if (!TTF_Init()) {
+			CONSOLE_ERROR("Error initializing TTF: (%s)", SDL_GetError());
 			SDL_Quit();
 			return NULL;
 		}
 		CONSOLE_LOG("Creating window named \"%s\"", title);
-		SDL_Window* pWindow = SDL_CreateWindow(title,
-			SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED,
-			WINDOW_WIDTH, WINDOW_HEIGHT,
-			SDL_WINDOW_SHOWN);
+		SDL_Window* pWindow = SDL_CreateWindow(title, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 		if (pWindow == nullptr) {
 			CONSOLE_ERROR("Error initializing window: (%s)", SDL_GetError());
 			return NULL;
@@ -174,7 +169,7 @@ namespace loader {
 
 	uchar quit_engine(Assets& assets, Screen& s, const uchar& code) noexcept {
 		CONSOLE_LOG("Freeing window surface");
-		SDL_FreeSurface(s.surface);
+		SDL_DestroySurface(s.surface);
 		assets.free();
 		return quit_engine(s.window, code);
 	}
@@ -183,7 +178,7 @@ namespace loader {
 		CONSOLE_LOG("Loading font %s sized %d", name, size);
 		*font = TTF_OpenFont(name, size);
 		if (*font == nullptr) {
-			CONSOLE_ERROR("Ressources loading error: (%s)", TTF_GetError());
+			CONSOLE_ERROR("Ressources loading error: (%s)", SDL_GetError());
 			return true;
 		}
 		return false;
@@ -193,7 +188,7 @@ namespace loader {
 		CONSOLE_LOG("Loading texture %s ", name);
 		*surface = IMG_Load(name);
 		if (*surface == nullptr) {
-			CONSOLE_ERROR("Ressources loading error: (%s)", IMG_GetError());
+			CONSOLE_ERROR("Ressources loading error: (%s)", SDL_GetError());
 			return true;
 		}
 		return false;

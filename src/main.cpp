@@ -3,7 +3,7 @@
 #include "main_menu.hpp"
 
 #ifdef __DEBUG__
-void* operator new(size_t size) noexcept {
+void* operator new(size_t size) {
 	CONSOLE_LOG("Allocating %zu bytes", size);
 	return malloc(size);
 }
@@ -37,19 +37,18 @@ int main(int argc, char** argv) {
 	CONSOLE_LOG("Mario Sokoban Remake V%s", GAME_VERSION);
 	for (int i = 0; i < argc; i++)
 		CONSOLE_LOG("argv[%d] = %s", i, argv[i]);
-	SDL_version v;
-	SDL_VERSION(&v);
-	CONSOLE_LOG("SDL (compiled) MAJOR=%d MINOR=%d PATCH=%d", v.major, v.minor, v.patch);
-	SDL_GetVersion(&v);
-	CONSOLE_LOG("SDL (linked) MAJOR=%d MINOR=%d PATCH=%d", v.major, v.minor, v.patch);
-	SDL_TTF_VERSION(&v);
-	CONSOLE_LOG("SDL_TTF (compiled) MAJOR=%d MINOR=%d PATCH=%d", v.major, v.minor, v.patch);
-	v = *TTF_Linked_Version();
-	CONSOLE_LOG("SDL_TTF (linked) MAJOR=%d MINOR=%d PATCH=%d", v.major, v.minor, v.patch);
-	SDL_IMAGE_VERSION(&v);
-	CONSOLE_LOG("SDL_IMAGE (compiled) MAJOR=%d MINOR=%d PATCH=%d", v.major, v.minor, v.patch);
-	v = *IMG_Linked_Version();
-	CONSOLE_LOG("SDL_IMAGE (linked) MAJOR=%d MINOR=%d PATCH=%d", v.major, v.minor, v.patch);
+	int v = SDL_VERSION;
+	CONSOLE_LOG("SDL (compiled) MAJOR=%d MINOR=%d PATCH=%d", SDL_VERSIONNUM_MAJOR(v), SDL_VERSIONNUM_MINOR(v), SDL_VERSIONNUM_MICRO(v));
+	v = SDL_GetVersion();
+	CONSOLE_LOG("SDL (linked) MAJOR=%d MINOR=%d PATCH=%d", SDL_VERSIONNUM_MAJOR(v), SDL_VERSIONNUM_MINOR(v), SDL_VERSIONNUM_MICRO(v));
+	v = SDL_TTF_VERSION;
+	CONSOLE_LOG("SDL_TTF (compiled) MAJOR=%d MINOR=%d PATCH=%d", SDL_VERSIONNUM_MAJOR(v), SDL_VERSIONNUM_MINOR(v), SDL_VERSIONNUM_MICRO(v));
+	v = TTF_Version();
+	CONSOLE_LOG("SDL_TTF (linked) MAJOR=%d MINOR=%d PATCH=%d", SDL_VERSIONNUM_MAJOR(v), SDL_VERSIONNUM_MINOR(v), SDL_VERSIONNUM_MICRO(v));
+	v = SDL_IMAGE_VERSION;
+	CONSOLE_LOG("SDL_IMAGE (compiled) MAJOR=%d MINOR=%d PATCH=%d", SDL_VERSIONNUM_MAJOR(v), SDL_VERSIONNUM_MINOR(v), SDL_VERSIONNUM_MICRO(v));
+	v = IMG_Version();
+	CONSOLE_LOG("SDL_IMAGE (linked) MAJOR=%d MINOR=%d PATCH=%d", SDL_VERSIONNUM_MAJOR(v), SDL_VERSIONNUM_MINOR(v), SDL_VERSIONNUM_MICRO(v));
 #endif
 	using namespace loader;
 
@@ -72,7 +71,7 @@ int main(int argc, char** argv) {
 	}
 
 	SDL_SetWindowIcon(s.window, assets.window_icon);
-	SDL_ShowCursor(SDL_FALSE);
+	SDL_ShowCursor();
 	main_menu::loop(s, assets);
 
 	return quit_engine(assets, s, EXIT_SUCCESS);

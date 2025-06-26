@@ -11,9 +11,9 @@ ICON_SRC := $(SRC_DIR)/icon.rc
 ICON_OBJ := $(OBJ_DIR)/icon.res
 CPPFLAGS := -DDEBUG -D __DEBUG__ --wrapv -I./src -MMD -MP
 CFLAGS := -m64 -std=c++17 -g -Wall -Werror -Wextra
-LDLIBS := $(shell $(PREFIX)pkg-config --cflags --libs sdl2)
-LDLIBS := $(LDLIBS) $(shell $(PREFIX)pkg-config --cflags --libs SDL2_image)
-LDLIBS := $(LDLIBS) $(shell $(PREFIX)pkg-config --cflags --libs SDL2_ttf)
+LDLIBS := $(shell $(PREFIX)pkg-config --cflags --libs sdl3)
+LDLIBS := $(LDLIBS) $(shell $(PREFIX)pkg-config --cflags --libs sdl3-image)
+LDLIBS := $(LDLIBS) $(shell $(PREFIX)pkg-config --cflags --libs sdl3-ttf)
 
 WINDOWS := 0
 ifeq ($(OS),Windows_NT)

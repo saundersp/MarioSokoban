@@ -66,7 +66,7 @@ namespace editor {
 			current_level = n;
 			char level[20] = { 0 };
 			sprintf(level, "Custom Level : %d\n", n + 1);
-			lvlDisplay = TTF_RenderText_Blended(assets.arial_blk_md, level, color_lvlDisplay);
+			lvlDisplay = TTF_RenderText_Blended(assets.arial_blk_md, level, 20, color_lvlDisplay);
 			posLvlDisplay.x = s.surface->w / 2 - lvlDisplay->w / 2;
 			posLvlDisplay.y = s.surface->h - lvlDisplay->h;
 			return load_level(n, blocks);
@@ -83,12 +83,11 @@ namespace editor {
 		while (exit_code == ExitCode::NONE) {
 			if (SDL_WaitEvent(&event)) {
 				switch (event.type) {
-				case SDL_WINDOWEVENT:
-					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-				case SDL_QUIT:
+				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				case SDL_EVENT_QUIT:
 					exit_code = ExitCode::QUIT;
 					break;
-				case SDL_MOUSEBUTTONDOWN:
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
 					switch (event.button.button) {
 					case SDL_BUTTON_LEFT:
 						holdLeft = true;
@@ -100,7 +99,7 @@ namespace editor {
 						break;
 					}
 					break;
-				case SDL_MOUSEBUTTONUP:
+				case SDL_EVENT_MOUSE_BUTTON_UP:
 					switch (event.button.button) {
 					case SDL_BUTTON_LEFT:
 						holdLeft = false;
@@ -110,7 +109,7 @@ namespace editor {
 						break;
 					}
 					break;
-				case SDL_MOUSEMOTION:
+				case SDL_EVENT_MOUSE_MOTION:
 					posMini.x = event.motion.x;
 					posMini.y = event.motion.y;
 					if (holdLeft)
@@ -118,18 +117,18 @@ namespace editor {
 					else if (holdRight)
 						blocks[posMini.y / BLOCK_SIZE * NB_BLOCKS_WIDTH + posMini.x / BLOCK_SIZE] = SpriteName::EMPTY;
 					break;
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					if (event.key.repeat == 0)
-						switch (event.key.keysym.sym) {
+						switch (event.key.key) {
 						case SDLK_ESCAPE:
 							exit_code = ExitCode::RETURN;
 							break;
-						case SDLK_r:
+						case SDLK_R:
 							if (makeCurrentLevel(current_level))
 								return ExitCode::CRASH;
 							else
 								break;
-						case SDLK_s:
+						case SDLK_S:
 							save_level(current_level, blocks);
 							break;
 						case SDLK_DOWN:
@@ -149,25 +148,27 @@ namespace editor {
 						case SDLK_2:
 						case SDLK_3:
 						case SDLK_5:
-							selected_asset = (SpriteName)(event.key.keysym.sym - SDLK_0 + (int)SpriteName::EMPTY);
+							selected_asset = (SpriteName)(event.key.key - SDLK_0 + (int)SpriteName::EMPTY);
 							break;
 
 						case SDLK_KP_1:
 						case SDLK_KP_2:
 						case SDLK_KP_3:
 						case SDLK_KP_5:
-							selected_asset = (SpriteName)(event.key.keysym.sym - SDLK_KP_1 + 1 + (int)SpriteName::EMPTY);
+							selected_asset = (SpriteName)(event.key.key - SDLK_KP_1 + 1 + (int)SpriteName::EMPTY);
 							break;
 
 						case SDLK_4:
 						case SDLK_KP_4:
 							selected_asset = SpriteName::CHARACTER;
 							break;
+						default:
+							break;
 						}
 				}
 			}
 
-			SDL_FillRect(s.surface, NULL, SDL_MapRGB(s.surface->format, 0, 0, 0));
+			SDL_FillSurfaceRect(s.surface, NULL, SDL_MapRGB(SDL_GetPixelFormatDetails(s.surface->format), NULL, 0, 0, 0));
 
 			for (uchar y = 0; y < NB_BLOCKS_HEIGHT; y++)
 				for (uchar x = 0; x < NB_BLOCKS_WIDTH; x++) {

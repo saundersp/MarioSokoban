@@ -12,18 +12,20 @@ namespace credits {
 		while (exit_code == ExitCode::NONE) {
 			if (SDL_WaitEvent(&event)) {
 				switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					exit_code = ExitCode::QUIT;
 					break;
-				case SDL_WINDOWEVENT:
-					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+				case SDL_EVENT_WINDOW_LAST:
+					if (event.window.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
 						exit_code = ExitCode::QUIT;
 					break;
-				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
+				case SDL_EVENT_KEY_DOWN:
+					switch (event.key.key) {
 					case SDLK_RETURN:
 					case SDLK_ESCAPE:
 						exit_code = ExitCode::RETURN;
+						break;
+					default:
 						break;
 					}
 				}

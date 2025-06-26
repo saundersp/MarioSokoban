@@ -34,14 +34,13 @@ namespace main_menu {
 		while (exit_code == ExitCode::CONTINUE) {
 			if (SDL_WaitEvent(&event)) {
 				switch (event.type) {
-				case SDL_WINDOWEVENT:
-					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-				case SDL_QUIT:
+				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				case SDL_EVENT_QUIT:
 					exit_code = ExitCode::QUIT;
 					break;
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					if (event.key.repeat == 0)
-						switch (event.key.keysym.sym) {
+						switch (event.key.key) {
 						case SDLK_ESCAPE:
 							exit_code = ExitCode::QUIT;
 							break;

@@ -72,13 +72,12 @@ namespace game {
 		while (exit_code == ExitCode::NONE) {
 			if (SDL_WaitEvent(&event)) {
 				switch (event.type) {
-				case SDL_WINDOWEVENT:
-					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-				case SDL_QUIT:
+				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				case SDL_EVENT_QUIT:
 					exit_code = ExitCode::QUIT;
 					break;
-				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
+				case SDL_EVENT_KEY_DOWN:
+					switch (event.key.key) {
 					case SDLK_ESCAPE:
 						exit_code = ExitCode::RETURN;
 						break;
@@ -137,7 +136,7 @@ namespace game {
 				char level[20] = { 0 };
 				if (isSource) sprintf(level, "Level : %d\n", n + 1);
 				else sprintf(level, "Custom Level: %d\n", real_n + 1);
-				lvlDisplay = TTF_RenderText_Blended(assets.arial_blk_md, level, color_lvlDisplay);
+				lvlDisplay = TTF_RenderText_Blended(assets.arial_blk_md, level, 20, color_lvlDisplay);
 				posLvlDisplay.x = s.surface->w / 2 - lvlDisplay->w / 2;
 				posLvlDisplay.y = s.surface->h - lvlDisplay->h;
 			}
@@ -153,18 +152,17 @@ namespace game {
 		while (exit_code == ExitCode::NONE) {
 			if (SDL_WaitEvent(&event)) {
 				switch (event.type) {
-				case SDL_WINDOWEVENT:
-					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-				case SDL_QUIT:
+				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				case SDL_EVENT_QUIT:
 					exit_code = ExitCode::QUIT;
 					break;
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					if (event.key.repeat == 0)
-						switch (event.key.keysym.sym) {
+						switch (event.key.key) {
 						case SDLK_ESCAPE:
 							exit_code = ExitCode::RETURN;
 							break;
-						case SDLK_r:
+						case SDLK_R:
 							if (makeCurrentLevel(currentLevel))
 								exit_code = ExitCode::CRASH;
 							break;
@@ -183,7 +181,7 @@ namespace game {
 						case SDLK_RIGHT:
 						case SDLK_DOWN:
 						case SDLK_LEFT:
-							movePlayer(p, (Direction)event.key.keysym.sym, blocks);
+							movePlayer(p, (Direction)event.key.key, blocks);
 							uchar nb_objective = 0;
 							for (const SpriteName& val : blocks)
 								if (val == SpriteName::OBJECTIVE)
@@ -197,7 +195,7 @@ namespace game {
 				}
 			}
 
-			SDL_FillRect(s.surface, NULL, SDL_MapRGB(s.surface->format, 0, 0, 0));
+			SDL_FillSurfaceRect(s.surface, NULL, SDL_MapRGB(SDL_GetPixelFormatDetails(s.surface->format), NULL, 0, 0, 0));
 
 			for (uchar y = 0; y < NB_BLOCKS_HEIGHT; ++y)
 				for (uchar x = 0; x < NB_BLOCKS_WIDTH; ++x) {

@@ -89,14 +89,13 @@ namespace options_menu {
 		while (exit_code == ExitCode::NONE) {
 			if (SDL_WaitEvent(&event)) {
 				switch (event.type) {
-				case SDL_WINDOWEVENT:
-					if (event.window.event == SDL_WINDOWEVENT_CLOSE)
-				case SDL_QUIT:
+				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				case SDL_EVENT_QUIT:
 					exit_code = ExitCode::QUIT;
 					break;
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					if (event.key.repeat == 0)
-						switch (event.key.keysym.sym) {
+						switch (event.key.key) {
 						case SDLK_ESCAPE:
 							exit_code = ExitCode::RETURN;
 							break;
@@ -152,7 +151,7 @@ namespace options_menu {
 						}
 				}
 			}
-			SDL_FillRect(s.surface, NULL, SDL_MapRGB(s.surface->format, 0, 0, 0));
+			SDL_FillSurfaceRect(s.surface, NULL, SDL_MapRGB(SDL_GetPixelFormatDetails(s.surface->format), NULL, 0, 0, 0));
 			SDL_BlitSurface(assets.menu_options, NULL, s.surface, NULL);
 			for (const SDLRect& p : { point1, point2 })
 				draw(assets.objective, p);

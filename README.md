@@ -17,9 +17,9 @@ make release
 
 ## Libraries Used
 
-- [SDL 2.0.20](https://www.libsdl.org)
-- [SDL_Image 2.0.5](https://www.libsdl.org/projects/SDL_image/)
-- [SDL_TTF 2.0.18](https://www.libsdl.org/projects/SDL_ttf/)
+- [SDL 3.2.16](https://www.libsdl.org)
+- [SDL_Image 3.2.4](https://www.libsdl.org/projects/SDL_image/)
+- [SDL_TTF 3.2.2](https://www.libsdl.org/projects/SDL_ttf/)
 
 ## Credits
 
