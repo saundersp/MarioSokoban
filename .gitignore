@@ -2,5 +2,3 @@ include
 lib
 bin
 out
-.vscode
-.vim
