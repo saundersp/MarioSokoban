@@ -23,6 +23,6 @@ make release
 
 ## Crédits
 
-La plupart des assets ont été crées par _Mateo21_ et sont accessibles [ici](http://sdz.tdct.org/sdz/apprenez-a-programmer-en-c.html#TPMarioSokoban).
+La plupart des assets ont été crée par _Mateo21_ et sont accessibles [ici](http://sdz.tdct.org/sdz/apprenez-a-programmer-en-c.html#TPMarioSokoban).
 
 *2020 Pierre Saunders @saundersp*
